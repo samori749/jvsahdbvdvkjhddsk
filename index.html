@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КиберБитва: Онлайн Викторина (Информатика 7 класс)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            touch-action: manipulation;
+        }
+        .font-pixel {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .neon-border {
+            box-shadow: 0 0 18px rgba(99, 102, 241, 0.35);
+        }
+        .neon-glow-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+        .neon-glow-red {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+        .card-glass {
+            background: rgba(30, 41, 59, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .blook-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 16px rgba(129, 140, 248, 0.9)); }
+        }
+        .blook-selected {
+            animation: pulseGlow 1.8s infinite ease-in-out;
+            border-color: #818cf8 !important;
+            background: rgba(99, 102, 241, 0.25) !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-3 sm:p-4 selection:bg-indigo-500 selection:text-white">
+
+    <header class="w-full max-w-5xl flex justify-between items-center py-3 px-2 border-b border-slate-800">
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-pixel text-lg sm:text-xl text-yellow-300 shadow-lg cursor-pointer" onclick="showRoleSelect()">
+                &lt;&gt;
+            </div>
+            <div>
+                <h1 class="font-pixel text-xs sm:text-base text-indigo-400 tracking-wider cursor-pointer" onclick="showRoleSelect()">КИБЕРБИТВА</h1>
+                <p class="text-[10px] sm:text-xs text-slate-400">Онлайн-турнир • Информатика 7 класс</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="soundToggle" onclick="toggleSound()" class="px-3 py-1.5 rounded-lg card-glass text-xs text-slate-300 hover:bg-slate-700 transition flex items-center gap-1 cursor-pointer">
+                <span id="soundIcon">🔊</span> <span class="hidden sm:inline">Звук</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl my-auto py-4 sm:py-6">
+
+        <section id="roleSelectScreen" class="card-glass rounded-2xl p-5 sm:p-8 neon-border transition-all max-w-2xl mx-auto text-center">
+            <div class="mb-6">
+                <span class="inline-block px-3 py-1 bg-indigo-950 text-indigo-300 border border-indigo-500/30 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
+                    Подключение до 30 участников
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">Добро пожаловать в КиберБитву!</h2>
+                <p class="text-slate-400 text-xs sm:text-sm">Интерактивная викторина из 45 вопросов. Подключайтесь с любых смартфонов, планшетов или ПК.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
+                <button onclick="showHostSetup()" class="p-5 rounded-2xl bg-gradient-to-br from-indigo-900/60 to-slate-800 border border-indigo-500/40 hover:border-indigo-400 hover:scale-[1.02] active:scale-98 transition flex flex-col items-center text-center group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-2xl mb-3 group-hover:bg-indigo-600 group-hover:text-white transition">
+                        👨‍🏫
+                    </div>
+                    <h3 class="font-bold text-base text-white mb-1">Создать комнату</h3>
+                    <p class="text-xs text-slate-400">Для учителя / ведущего. Вы получаете код комнаты и управляете викториной.</p>
+                </button>
+
+                <button onclick="showPlayerJoin()" class="p-5 rounded-2xl bg-gradient-to-br from-emerald-900/60 to-slate-800 border border-emerald-500/40 hover:border-emerald-400 hover:scale-[1.02] active:scale-98 transition flex flex-col items-center text-center group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-600/30 text-emerald-300 flex items-center justify-center text-2xl mb-3 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        🎮
+                    </div>
+                    <h3 class="font-bold text-base text-white mb-1">Войти по коду</h3>
+                    <p class="text-xs text-slate-400">Для учеников. Введите 6-значный код комнаты с экрана ведущего.</p>
+                </button>
+            </div>
+        </section>
+
+        <section id="hostLobbyScreen" class="hidden card-glass rounded-2xl p-5 sm:p-8 neon-border max-w-3xl mx-auto">
+            <div class="text-center mb-4">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Панель ведущего</span>
+                <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Комната готова к подключению!</h2>
+            </div>
+
+            <div class="bg-indigo-950/80 border border-indigo-500/50 rounded-2xl p-6 text-center my-4 neon-border relative">
+                <p class="text-xs text-indigo-300 uppercase tracking-widest font-semibold mb-2">Код для подключения учеников:</p>
+                <div id="hostRoomCodeDisplay" class="font-pixel text-4xl sm:text-6xl text-yellow-400 tracking-wider my-2 selection:bg-yellow-400 selection:text-slate-900">
+                    ------
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Ученики заходят с телефонов и вводят этот код</p>
+            </div>
+
+            <div class="my-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-slate-200">Подключившиеся игроки (<span id="hostPlayerCount">0</span>/30):</h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="addDemoBot()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 px-2.5 py-1 rounded-lg transition cursor-pointer">
+                            🤖 + Бот для теста
+                        </button>
+                        <button onclick="copyRoomCode()" class="text-xs bg-indigo-900/60 hover:bg-indigo-800 border border-indigo-500/40 text-indigo-300 px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer">
+                            📋 <span id="copyBtnText">Копировать код</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="hostPlayerList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-56 overflow-y-auto custom-scrollbar p-1">
+                    <div class="col-span-full text-center py-6 text-slate-500 text-xs italic">
+                        Ожидаем подключение учеников... Назовите им код выше!
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="showRoleSelect()" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm transition cursor-pointer">
+                    ← В главное меню
+                </button>
+                <button onclick="startHostGame()" id="startGameBtn" disabled class="flex-1 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-bold text-base transition shadow-lg shadow-emerald-600/30 cursor-pointer">
+                    🚀 Начать турнир (45 вопросов)
+                </button>
+            </div>
+        </section>
+
+        <section id="playerJoinScreen" class="hidden card-glass rounded-2xl p-5 sm:p-8 neon-border max-w-md mx-auto">
+            <div class="text-center mb-5">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-1">Присоединиться к игре</h2>
+                <p class="text-xs text-slate-400">Выберите персонажа и введите код с экрана учителя</p>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-xs font-semibold text-indigo-300 uppercase tracking-wider mb-2 text-center">Выбери своего аватар-Blook:</label>
+                <div id="avatarGrid" class="grid grid-cols-4 gap-2 p-2 bg-slate-900/70 rounded-xl border border-slate-800 max-h-36 overflow-y-auto custom-scrollbar">
+                    <!-- Dynamic Blook Icons -->
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Код комнаты (6 цифр):</label>
+                    <input type="text" id="joinCodeInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" oninput="this.value = this.value.replace(/\D/g, '')" class="w-full bg-slate-900 border border-indigo-500/50 rounded-xl px-4 py-3 text-center font-pixel text-2xl sm:text-3xl text-yellow-400 tracking-widest outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/40 uppercase transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Твое Имя / Никнейм:</label>
+                    <input type="text" id="joinNameInput" maxlength="18" placeholder="Например: Алекс" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-indigo-500 font-medium">
+                </div>
+            </div>
+
+            <button id="joinSubmitBtn" onclick="submitPlayerJoin()" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-base transition shadow-lg shadow-indigo-600/30 active:scale-95 cursor-pointer flex justify-center items-center gap-2">
+                <span>🎮 Войти в комнату</span>
+            </button>
+
+            <button onclick="showRoleSelect()" class="w-full mt-3 py-2 text-xs text-slate-400 hover:text-slate-200 cursor-pointer">
+                ← Назад к выбору роли
+            </button>
+        </section>
+
+        <section id="playerWaitingScreen" class="hidden card-glass rounded-2xl p-8 text-center neon-border max-w-md mx-auto">
+            <div id="playerWaitingAvatar" class="w-20 h-20 rounded-2xl bg-indigo-600/30 text-indigo-400 border border-indigo-500/50 flex items-center justify-center text-4xl mx-auto mb-4 blook-pop shadow-lg">
+                🦊
+            </div>
+            <h2 class="text-xl font-bold text-white mb-1">Успешное подключение!</h2>
+            <div id="playerGreetingText" class="text-sm text-indigo-300 font-semibold mb-4 flex items-center justify-center gap-2">
+                <!-- Avatar & Name -->
+            </div>
+            <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 text-xs text-slate-400 flex items-center justify-center gap-2 mb-4">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Ожидаем старт турнира от ведущего...</span>
+            </div>
+            <button onclick="showRoleSelect()" class="text-xs text-slate-500 hover:text-slate-300 cursor-pointer">
+                Выйти из комнаты
+            </button>
+        </section>
+
+        <section id="countdownOverlay" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4">
+            <div class="text-center">
+                <span class="text-indigo-400 font-pixel text-xs sm:text-sm uppercase tracking-widest block mb-4">Приготовьтесь!</span>
+                <div id="countdownNumber" class="font-pixel text-7xl sm:text-9xl text-yellow-400 blook-pop tracking-wider">
+                    3
+                </div>
+                <p id="countdownSubtitle" class="text-slate-300 font-bold text-lg mt-6">Турнир начинается!</p>
+            </div>
+        </section>
+
+        <section id="hostGameScreen" class="hidden flex-col gap-4">
+            <div class="card-glass rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
+                <div>
+                    <span class="text-[10px] text-slate-400 uppercase tracking-widest block">Экран ведущего</span>
+                    <span id="hostGameCodeBadge" class="font-pixel text-xs text-yellow-400">Код: ------</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="hostAnsweredCounter" class="text-xs bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-emerald-400 font-semibold">
+                        Ответили: 0 из 0
+                    </span>
+                    <button onclick="hostNextQuestion()" id="hostNextBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow cursor-pointer">
+                        Следующий вопрос ➔
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-glass rounded-2xl p-4 sm:p-6 neon-border">
+                <div class="flex justify-between items-center text-xs font-mono text-indigo-400 font-bold mb-2">
+                    <span id="hostQuestionNum">ВОПРОС 1 / 45</span>
+                </div>
+
+                <h2 id="hostQuestionText" class="text-base sm:text-xl font-bold text-white mb-4">
+                    Загрузка вопроса...
+                </h2>
+
+                <div id="hostAnswerOptionsDisplay" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 mb-4">
+                    <!-- Dynamic option display -->
+                </div>
+            </div>
+
+            <div class="card-glass rounded-2xl p-4 border border-slate-800">
+                <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-3">📊 Живой рейтинг участников:</h3>
+                <div id="hostLiveLeaderboard" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-60 overflow-y-auto custom-scrollbar">
+                    <!-- Dynamic Live Rankings -->
+                </div>
+            </div>
+        </section>
+
+        <section id="playerGameScreen" class="hidden flex-col gap-4">
+            <div class="card-glass rounded-xl p-3 flex justify-between items-center text-xs">
+                <div class="flex items-center space-x-2">
+                    <span id="playerAvatarBadge" class="text-xl">🦊</span>
+                    <span id="playerSelfName" class="font-bold text-indigo-300">Игрок</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div id="playerStreakBadge" class="hidden px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold text-[11px] animate-pulse">
+                        🔥 x2
+                    </div>
+                    <div class="font-pixel text-yellow-400" id="playerSelfScore">0 оч.</div>
+                </div>
+            </div>
+
+            <div class="card-glass rounded-2xl p-4 sm:p-6 neon-border relative">
+                <div class="flex justify-between items-center text-xs font-mono text-indigo-400 font-bold mb-2">
+                    <span id="playerQuestionNum">ВОПРОС 1 / 45</span>
+                </div>
+
+                <h2 id="playerQuestionText" class="text-base sm:text-lg font-bold text-white mb-5 leading-relaxed">
+                    Загрузка вопроса...
+                </h2>
+
+                <div id="playerAnswersGrid" class="grid grid-cols-1 gap-3">
+                    <!-- Option buttons -->
+                </div>
+            </div>
+
+            <div id="playerFeedbackBox" class="hidden card-glass rounded-xl p-4 text-center border-l-4">
+                <div id="playerFeedbackTitle" class="font-bold text-sm mb-1"></div>
+                <div id="playerFeedbackDesc" class="text-xs text-slate-300"></div>
+            </div>
+        </section>
+
+        <section id="resultsScreen" class="hidden card-glass rounded-2xl p-6 sm:p-8 text-center neon-border max-w-2xl mx-auto">
+            <div class="text-4xl sm:text-5xl mb-2">🏆</div>
+            <h2 class="font-pixel text-base sm:text-xl text-yellow-400 mb-1">ТУРНИР ЗАВЕРШЕН!</h2>
+            <p class="text-xs text-slate-400 mb-4">Победитель соревнования:</p>
+            <div id="winnerName" class="text-2xl sm:text-3xl font-bold text-white mb-6 text-indigo-300">Игрок 1</div>
+
+            <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 mb-6">
+                <h3 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">Итоговые результаты:</h3>
+                <div id="leaderboardList" class="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto custom-scrollbar text-left">
+                    <!-- Final scores -->
+                </div>
+            </div>
+
+            <button onclick="showRoleSelect()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition cursor-pointer">
+                🔄 Выйти в главное меню
+            </button>
+        </section>
+
+    </main>
+
+    <div id="notificationModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="card-glass border border-indigo-500/50 rounded-2xl p-6 max-w-sm w-full text-center neon-border">
+            <div id="notifIcon" class="text-4xl mb-2">⚠️️</div>
+            <h3 id="notifTitle" class="text-lg font-bold text-white mb-2">Уведомление</h3>
+            <p id="notifMessage" class="text-xs text-slate-300 mb-6 leading-relaxed"></p>
+            <button onclick="closeNotification()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition cursor-pointer">
+                Понятно
+            </button>
+        </div>
+    </div>
+
+    <footer class="w-full max-w-5xl text-center py-3 text-[11px] text-slate-500 border-t border-slate-800/60">
+        Учебный тренажер по информатике • 7 класс • Сетевой режим для групп
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc, getDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        window.db = null;
+        window.auth = null;
+        window.currentUser = null;
+        window.appId = typeof __app_id !== 'undefined' ? __app_id : 'cyber-quiz-7kl';
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        if (firebaseConfig && firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('dummy')) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                window.db = getFirestore(app);
+                window.auth = getAuth(app);
+            } catch (e) {
+                console.warn("Firebase init fallback:", e);
+            }
+        }
+
+        window.ensureAuth = async () => {
+            if (window.currentUser) return window.currentUser;
+            if (window.auth) {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        const userCred = await signInWithCustomToken(window.auth, __initial_auth_token);
+                        window.currentUser = userCred.user;
+                    } else {
+                        const userCred = await signInAnonymously(window.auth);
+                        window.currentUser = userCred.user;
+                    }
+                } catch (err) {
+                    console.warn("Auth warning, using guest ID:", err);
+                }
+            }
+            if (!window.currentUser) {
+                window.currentUser = { uid: 'user_' + Math.random().toString(36).substring(2, 9) };
+            }
+            return window.currentUser;
+        };
+
+        window.fsDoc = doc;
+        window.fsSetDoc = setDoc;
+        window.fsUpdateDoc = updateDoc;
+        window.fsGetDoc = getDoc;
+        window.fsOnSnapshot = onSnapshot;
+        window.fsCollection = collection;
+    </script>
+
+    <script>
+        let soundEnabled = true;
+        let currentRoomCode = null;
+        let userRole = null; // 'host' or 'player'
+        let myPlayerId = null;
+        let myPlayerName = '';
+        let selectedAvatar = '🦊';
+        let roomUnsubscribe = null;
+        let localRoomState = null;
+
+        // Local Storage & Cross-Tab BroadcastChannel Fallback Engine
+        const localRooms = {};
+        const roomBroadcast = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('cyber_quiz_channel') : null;
+
+        if (roomBroadcast) {
+            roomBroadcast.onmessage = (event) => {
+                const { type, code, roomData } = event.data;
+                if (type === 'ROOM_SYNC' && code) {
+                    localRooms[code] = roomData;
+                    if (currentRoomCode === code && window.onLocalRoomUpdate) {
+                        window.onLocalRoomUpdate(roomData);
+                    }
+                }
+            };
+        }
+
+        function broadcastRoomUpdate(code, roomData) {
+            localRooms[code] = roomData;
+            try {
+                localStorage.setItem(`cq_room_${code}`, JSON.stringify(roomData));
+            } catch(e) {}
+            if (roomBroadcast) {
+                roomBroadcast.postMessage({ type: 'ROOM_SYNC', code, roomData });
+            }
+        }
+
+        function getLocalRoom(code) {
+            if (localRooms[code]) return localRooms[code];
+            try {
+                const stored = localStorage.getItem(`cq_room_${code}`);
+                if (stored) {
+                    localRooms[code] = JSON.parse(stored);
+                    return localRooms[code];
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        const BLOOK_AVATARS = ['🦊', '🐉', '🤖', '👽', '🚀', '🐱', '🦄', '🎮', '⚡', '👑', '🛡️', '💎', '🐯', '🐼', '👾', '🧙‍♂️'];
+
+        const QUESTIONS_45 = [
+            { q: "Что такое информация?", options: ["Сведения об окружающем мире и процессах", "Только текст в книгах", "Только компьютерные программы", "Электрический ток в проводе"], correct: 0, explanation: "Информация — это любые сведения об окружающем мире, воспринимаемые живыми организмами или техническими устройствами." },
+            { q: "Какая единица измерения информации является наименьшей?", options: ["Байт", "Бит", "Килобайт", "Бод"], correct: 1, explanation: "Наименьшая единица измерения информации — 1 бит (принимает значение 0 или 1)." },
+            { q: "Сколько бит содержится в одном байте?", options: ["4", "8", "10", "1024"], correct: 1, explanation: "1 байт = 8 бит." },
+            { q: "Сколько байт в 1 Килобайте (Кбайт)?", options: ["1000 байт", "1024 байта", "8000 байт", "512 байт"], correct: 1, explanation: "В информатике применяется двоичная система: 1 Кбайт = 2¹⁰ байт = 1024 байта." },
+            { q: "Сколько битов содержится в слове из 5 символов при 8-битной кодировке?", options: ["5 бит", "13 бит", "40 бит", "50 бит"], correct: 2, explanation: "5 символов × 8 бит = 40 бит (или 5 байт)." },
+            { q: "Что изучает наука Информатика?", options: ["Только устройство компьютеров", "Способы сбора, хранения, обработки и передачи информации", "Технику безопасности при работе с электричеством", "Только создание видеоигр"], correct: 1, explanation: "Информатика — наука об информационных процессах и автоматизированной обработке данных." },
+            { q: "Какое из этих устройств относится к устройствам ввода информации?", options: ["Монитор", "Клавиатура", "Принтер", "Акустические колонки"], correct: 1, explanation: "Клавиатура передает команды и данные пользователя в компьютер (ввод)." },
+            { q: "Какое устройство относится к устройствам вывода информации?", options: ["Мышь", "Сканер", "Монитор", "Микрофон"], correct: 2, explanation: "Монитор отображает визуальную информацию пользователю (вывод)." },
+            { q: "Что является основным «мозгом» компьютера, выполняющим вычисления?", options: ["Оперативная память", "Процессор (ЦПУ)", "Жесткий диск", "Блок питания"], correct: 1, explanation: "Процессор осуществляет обработку данных и выполнение всех команд." },
+            { q: "Для чего предназначена оперативная память (ОЗУ)?", options: ["Для временного хранения данных во время работы компьютера", "Для постоянного хранения файлов при выключенном ПК", "Для защиты от вирусов", "Для печати документов"], correct: 0, explanation: "ОЗУ хранит данные запущенных программ только пока компьютер включен (энергозависимая память)." },
+            { q: "Чем долговременная память (HDD / SSD) отличается от оперативной?", options: ["Она работает быстрее ОЗУ", "Сохраняет файлы при выключении питания", "Используется только для игр", "В ней нельзя хранить видео"], correct: 1, explanation: "Накопители (HDD/SSD) хранят файлы постоянно, независимо от питания." },
+            { q: "Что такое программное обеспечение (ПО)?", options: ["Детали внутри системного блока", "Совокупность всех программ, установленных на ПК", "Инструкция по сборке компьютера", "Провода и кабели"], correct: 1, explanation: "ПО — это вся совокупность программ для решения задач на компьютере." },
+            { q: "К какому типу ПО относится операционная система (Windows, Linux, macOS)?", options: ["Прикладное ПО", "Системное ПО", "Инструментальное ПО", "Игровое ПО"], correct: 1, explanation: "Операционная система относится к системному ПО и управляет всеми ресурсами ПК." },
+            { q: "Что такое файл?", options: ["Папка на рабочем столе", "Поименованная область памяти на носителе информации", "Клавиша на клавиатуре", "Экран монитора"], correct: 1, explanation: "Файл — это поименованное место на диске для хранения данных единого типа." },
+            { q: "Что указывает на тип файла и программу для его открытия?", options: ["Имя файла", "Расширение файла (например, .txt, .jpg)", "Размер файла", "Дата создания"], correct: 1, explanation: "Расширение файла идет после точки и определяет тип файла (.png, .mp3, .docx)." },
+            { q: "Как называется полная цепочка папок от диска до конкретного файла?", options: ["Маршрут сети", "Путь к файлу", "Адрес сайта", "Индекс файла"], correct: 1, explanation: "Путь к файлу показывает его точное местоположение (например: C:\\Документы\\Урок.docx)." },
+            { q: "Какое расширение обычно имеют текстовые файлы?", options: [".exe", ".txt", ".mp3", ".bmp"], correct: 1, explanation: ".txt и .docx — популярные расширения для текстовых документов." },
+            { q: "Какое расширение имеют исполняемые файлы программ в Windows?", options: [".exe", ".jpg", ".avi", ".zip"], correct: 0, explanation: ".exe (executable) — исполняемая программа в Windows." },
+            { q: "Что такое растровое графическое изображение?", options: ["Изображение из математических формул", "Изображение, состоящее из сетки пикселей", "Звуковой файл", "Текстовый документ"], correct: 1, explanation: "Растровая графика состоит из мозаики точек (пикселей)." },
+            { q: "Что является наименьшим элементом растрового изображения?", options: ["Символ", "Пиксель", "Вектор", "Сантиметр"], correct: 1, explanation: "Пиксель (picture element) — отдельная точка растрового рисунка." },
+            { q: "Чем векторная графика отличается от растровой?", options: ["Состоит из фигур и формул, поэтому не теряет качество при масштабировании", "Состоит из пикселей", "Занимает всегда больше места", "Не может отображаться на экране"], correct: 0, explanation: "Векторная графика опирается на геометрические объекты и легко масштабируется без потерь." },
+            { q: "Какая цветовая модель используется в мониторах и экранах?", options: ["CMYK", "RGB (Red, Green, Blue)", "HSB", "Grayscale"], correct: 1, explanation: "Модели экранов смешивают Красный, Зеленый и Синий (RGB)." },
+            { q: "Что происходит с качеством растрового рисунка при его сильном увеличении?", options: ["Качество улучшается", "Появляются пиксели («пикселизация») и качество ухудшается", "Ничего не меняется", "Рисунок превращается в текст"], correct: 1, explanation: "При увеличении растра пиксели становятся крупными и заметными." },
+            { q: "Какой графический редактор является стандартным в ОС Windows?", options: ["Photoshop", "Paint", "CorelDRAW", "Blender"], correct: 1, explanation: "Paint — базовый растровый графический редактор в составе Windows." },
+            { q: "Что такое кегль в текстовом редакторе?", options: ["Цвет текста", "Размер шрифта", "Гарнитура шрифта", "Отступ абзаца"], correct: 1, explanation: "Кегль — это размер высоты шрифта (например, 12pt, 14pt)." },
+            { q: "Какая комбинация клавиш используется для скопировать выделенный фрагмент?", options: ["Ctrl + V", "Ctrl + C", "Ctrl + Z", "Ctrl + X"], correct: 1, explanation: "Ctrl + C — скопировать в буфер обмена." },
+            { q: "Какая комбинация клавиш используется для вставить скопированный фрагмент?", options: ["Ctrl + C", "Ctrl + V", "Ctrl + A", "Ctrl + S"], correct: 1, explanation: "Ctrl + V — вставить из буфера обмена." },
+            { q: "Какая комбинация клавиш позволяет отменить последнее действие?", options: ["Ctrl + Z", "Ctrl + Y", "Ctrl + P", "Ctrl + N"], correct: 0, explanation: "Ctrl + Z — быстрое действие отмены в большинстве программ." },
+            { q: "Что такое форматирование текста?", options: ["Исправление грамматических ошибок", "Изменение внешнего вида текста (шрифт, цвет, выравнивание)", "Удаление текста", "Перевод на другой язык"], correct: 1, explanation: "Форматирование меняет оформление, не меняя сам смысл слов." },
+            { q: "Что такое редактирование текста?", options: ["Изменение оформления", "Внесение изменений в содержание (исправление ошибок, удаление слов)", "Сохранение файла", "Распечатка на принтере"], correct: 1, explanation: "Редактирование меняет текст по существу (правка опечаток, замена слов)." },
+            { q: "Что такое алгоритм?", options: ["Случайный набор чисел", "Точная и понятная последовательность команд для исполнителя", "Компьютерная программа для музыки", "Схема компьютера"], correct: 1, explanation: "Алгоритм — четкий порядок действий, приводящий к решению задачи." },
+            { q: "Как называется исполнитель алгоритмов в визуальной среде Scratch?", options: ["Робот", "Спрайт", "Пиксель", "Аватар"], correct: 1, explanation: "В Scratch персонажи-исполнители называются спрайтами." },
+            { q: "Какая геометрическая фигура в блок-схеме обозначает условие (проверку)?", options: ["Прямоугольник", "Овал", "Ромб", "Параллелограмм"], correct: 2, explanation: "Ромб обозначает принятие решения / ветвление." },
+            { q: "Какая геометрическая фигура в блок-схеме обозначает действие / процесс?", options: ["Прямоугольник", "Ромб", "Овал", "Круг"], correct: 0, explanation: "Прямоугольник показывает выполнимое действие." },
+            { q: "Как называется алгоритм, в котором команды выполняются строго по порядку друг за другом?", options: ["Линейный", "Разветвляющийся", "Циклический", "Вспомогательный"], correct: 0, explanation: "В линейном алгоритме нет ветвлений и повторов." },
+            { q: "Как называется алгоритм, в котором выбор действий зависит от условия?", options: ["Линейный", "Разветвляющийся", "Циклический", "Точечный"], correct: 1, explanation: "Разветвляющийся алгоритм содержит условия (Если ... То ... Иначе)." },
+            { q: "Как называется алгоритм, в котором серии команд повторяются многократно?", options: ["Циклический", "Линейный", "Простой", "Параллельный"], correct: 0, explanation: "Цикл позволяет повторять фрагмент кода необходимое число раз." },
+            { q: "Что такое Интернет?", options: ["Глобальная компьютерная сеть", "Локальный диск компьютера", "Программа для редактирования фото", "Антивирус"], correct: 0, explanation: "Интернет — всемирная система объединенных компьютерных сетей." },
+            { q: "Что такое IP-адрес?", options: ["Имя пользователя в соцсети", "Уникальный сетевой номер устройства в сети", "Пароль от Wi-Fi", "Модель процессора"], correct: 1, explanation: "IP-адрес уникально идентифицирует каждый компьютер в сети." },
+            { q: "Какая программа предназначена для просмотра веб-страниц в Интернете?", options: ["Текстовый редактор", "Браузер", "Антивирус", "Архиватор"], correct: 1, explanation: "Браузер (Chrome, Firefox, Edge) отображает HTML-страницы." },
+            { q: "Что означает значок «замочка» в адресной строке браузера?", options: ["Сайт заблокирован", "Защищенное безопасное соединение (HTTPS)", "На сайте есть вирус", "Сайт платный"], correct: 1, explanation: "Замочек указывает на HTTPS-шифрование данных." },
+            { q: "Какая служба Интернета используется для обмена электронными письмами?", options: ["World Wide Web", "Электронная почта (E-mail)", "FTP", "DNS"], correct: 1, explanation: "E-mail — служба передачи электронных сообщений." },
+            { q: "Что такое спам?", options: ["Важное письмо от учителя", "Ненужная массовая рекламная рассылка", "Компьютерный вирус", "Пароль от почты"], correct: 1, explanation: "Спам — незапрошенные массовые рекламные сообщения." },
+            { q: "Какое правило является главным для создания надежного пароля?", options: ["Использовать дату своего рождения", "Сочетать буквы разного регистра, цифры и спецсимволы", "Использовать слово '123456'", "Делать пароль из 3 букв"], correct: 1, explanation: "Сложные длинные пароли с разным регистром и символами трудно взломать." },
+            { q: "Какое устройство объединяет компьютеры в локальную сеть?", options: ["Коммутатор (свитч) / Маршрутизатор (роутер)", "Монитор", "Сканер", "Микрофон"], correct: 0, explanation: "Роутер или коммутатор обеспечивают соединение устройств в сеть." }
+        ];
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.04);
+                } else if (type === 'join') {
+                    osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'correct') {
+                    osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.08);
+                    osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.16);
+                    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.28);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } else if (type === 'beep') {
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                }
+            } catch(e) {}
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (icon) icon.innerText = soundEnabled ? '🔊' : '🔇';
+        }
+
+        function hideAllScreens() {
+            const screens = [
+                'roleSelectScreen', 
+                'hostLobbyScreen', 
+                'playerJoinScreen', 
+                'playerWaitingScreen', 
+                'hostGameScreen', 
+                'playerGameScreen', 
+                'resultsScreen'
+            ];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+        }
+
+        function showRoleSelect() {
+            playSound('click');
+            userRole = null;
+            if (roomUnsubscribe) {
+                roomUnsubscribe();
+                roomUnsubscribe = null;
+            }
+            hideAllScreens();
+            document.getElementById('roleSelectScreen').classList.remove('hidden');
+        }
+
+        function showNotification(title, message, isError = true) {
+            document.getElementById('notifIcon').innerText = isError ? '⚠️' : 'ℹ️';
+            document.getElementById('notifTitle').innerText = title;
+            document.getElementById('notifMessage').innerText = message;
+            document.getElementById('notificationModal').classList.remove('hidden');
+        }
+
+        function closeNotification() {
+            document.getElementById('notificationModal').classList.add('hidden');
+        }
+
+        function renderAvatarGrid() {
+            const grid = document.getElementById('avatarGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            BLOOK_AVATARS.forEach(avatar => {
+                const isSelected = avatar === selectedAvatar;
+                grid.innerHTML += `
+                    <button type="button" onclick="selectAvatar('${avatar}')" class="p-2 text-2xl rounded-xl border border-slate-700/80 hover:bg-indigo-600/20 flex items-center justify-center transition ${isSelected ? 'blook-selected' : 'bg-slate-800/50'} cursor-pointer">
+                        ${avatar}
+                    </button>
+                `;
+            });
+        }
+
+        function selectAvatar(avatar) {
+            playSound('click');
+            selectedAvatar = avatar;
+            renderAvatarGrid();
+        }
+
+        function copyRoomCode() {
+            if (!currentRoomCode) return;
+            navigator.clipboard.writeText(currentRoomCode).then(() => {
+                const btnText = document.getElementById('copyBtnText');
+                if (btnText) {
+                    btnText.innerText = 'Скопировано! ✓';
+                    setTimeout(() => btnText.innerText = 'Копировать код', 2000);
+                }
+            }).catch(() => {
+                document.execCommand('copy');
+            });
+        }
+
+        async function showHostSetup() {
+            playSound('click');
+            userRole = 'host';
+            hideAllScreens();
+            
+            currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById('hostRoomCodeDisplay').innerText = currentRoomCode;
+            document.getElementById('hostLobbyScreen').classList.remove('hidden');
+
+            const initialRoomData = {
+                code: currentRoomCode,
+                hostId: 'host_' + currentRoomCode,
+                status: 'lobby', // lobby | countdown | playing | finished
+                currentQuestionIdx: 0,
+                questionStartTime: Date.now(),
+                players: {},
+                questions: QUESTIONS_45
+            };
+
+            broadcastRoomUpdate(currentRoomCode, initialRoomData);
+
+            window.onLocalRoomUpdate = (data) => {
+                if (userRole === 'host') {
+                    if (data.status === 'lobby') renderHostLobby(data);
+                    else if (data.status === 'playing') renderHostGame(data);
+                    else if (data.status === 'finished') renderResultsScreen(data);
+                }
+            };
+
+            renderHostLobby(initialRoomData);
+
+            if (window.db) {
+                try {
+                    const user = await window.ensureAuth();
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    await window.fsSetDoc(roomRef, initialRoomData);
+
+                    if (roomUnsubscribe) roomUnsubscribe();
+                    roomUnsubscribe = window.fsOnSnapshot(roomRef, (snapshot) => {
+                        if (!snapshot.exists()) return;
+                        const data = snapshot.data();
+                        broadcastRoomUpdate(currentRoomCode, data);
+                        if (data.status === 'lobby') renderHostLobby(data);
+                        else if (data.status === 'playing') renderHostGame(data);
+                        else if (data.status === 'finished') renderResultsScreen(data);
+                    }, (err) => console.warn("Cloud host listener fallback:", err));
+                } catch (err) {
+                    console.warn("Using local room sync engine:", err);
+                }
+            }
+        }
+
+        function renderHostLobby(roomData) {
+            const players = roomData.players || {};
+            const playerKeys = Object.keys(players);
+            document.getElementById('hostPlayerCount').innerText = playerKeys.length;
+
+            const listEl = document.getElementById('hostPlayerList');
+            const startBtn = document.getElementById('startGameBtn');
+
+            if (playerKeys.length === 0) {
+                listEl.innerHTML = `<div class="col-span-full text-center py-6 text-slate-500 text-xs italic">Ожидаем участников... Введите код ${currentRoomCode} на других смартфонах!</div>`;
+                startBtn.disabled = true;
+            } else {
+                startBtn.disabled = false;
+                listEl.innerHTML = '';
+                playerKeys.forEach((pid) => {
+                    const p = players[pid];
+                    const avatar = p.avatar || '🦊';
+                    listEl.innerHTML += `
+                        <div onclick="kickPlayer('${pid}')" title="Нажмите, чтобы исключить" class="p-2.5 rounded-xl bg-slate-800/90 border border-indigo-500/30 hover:border-rose-500/60 hover:bg-rose-950/20 flex items-center space-x-2 truncate blook-pop transition cursor-pointer group">
+                            <span class="text-xl shrink-0">${avatar}</span>
+                            <span class="text-xs font-bold text-white truncate group-hover:text-rose-300">${p.name}</span>
+                            <span class="ml-auto text-[10px] opacity-0 group-hover:opacity-100 text-rose-400 font-bold shrink-0">❌</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function addDemoBot() {
+            playSound('click');
+            if (!currentRoomCode) return;
+            const room = getLocalRoom(currentRoomCode);
+            if (!room) return;
+            const botId = 'bot_' + Math.random().toString(36).substring(2, 7);
+            const botNames = ['Бот_Макс', 'Бот_Анна', 'Бот_Артем', 'Бот_София', 'Бот_Кирилл'];
+            const randomName = botNames[Math.floor(Math.random() * botNames.length)] + '_' + Math.floor(Math.random() * 90 + 10);
+            const randomAvatar = BLOOK_AVATARS[Math.floor(Math.random() * BLOOK_AVATARS.length)];
+
+            room.players[botId] = {
+                id: botId,
+                name: randomName,
+                avatar: randomAvatar,
+                score: 0,
+                streak: 0,
+                correctAnswers: 0,
+                answeredCurrent: false,
+                lastAnswerCorrect: null
+            };
+
+            broadcastRoomUpdate(currentRoomCode, room);
+            renderHostLobby(room);
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    window.fsUpdateDoc(roomRef, { [`players.${botId}`]: room.players[botId] });
+                } catch(e) {}
+            }
+        }
+
+        async function kickPlayer(playerId) {
+            if (!currentRoomCode) return;
+            const room = getLocalRoom(currentRoomCode);
+            if (room && room.players[playerId]) {
+                delete room.players[playerId];
+                broadcastRoomUpdate(currentRoomCode, room);
+                renderHostLobby(room);
+            }
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    const roomSnap = await window.fsGetDoc(roomRef);
+                    if (roomSnap.exists()) {
+                        const players = { ...roomSnap.data().players };
+                        delete players[playerId];
+                        await window.fsUpdateDoc(roomRef, { players });
+                    }
+                } catch (err) {}
+            }
+            playSound('click');
+        }
+
+        async function startHostGame() {
+            playSound('click');
+            if (!currentRoomCode) return;
+            const room = getLocalRoom(currentRoomCode);
+            if (room) {
+                room.status = 'countdown';
+                broadcastRoomUpdate(currentRoomCode, room);
+            }
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    await window.fsUpdateDoc(roomRef, { status: 'countdown' });
+                } catch(e) {}
+            }
+
+            triggerCountdownUI(async () => {
+                if (room) {
+                    room.status = 'playing';
+                    room.currentQuestionIdx = 0;
+                    room.questionStartTime = Date.now();
+                    broadcastRoomUpdate(currentRoomCode, room);
+                }
+
+                if (window.db) {
+                    try {
+                        const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                        await window.fsUpdateDoc(roomRef, {
+                            status: 'playing',
+                            currentQuestionIdx: 0,
+                            questionStartTime: Date.now()
+                        });
+                    } catch(e) {}
+                }
+            });
+        }
+
+        function triggerCountdownUI(callback) {
+            const overlay = document.getElementById('countdownOverlay');
+            const numEl = document.getElementById('countdownNumber');
+            overlay.classList.remove('hidden');
+
+            let count = 3;
+            numEl.innerText = count;
+            playSound('beep');
+
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    numEl.innerText = count;
+                    numEl.classList.remove('blook-pop');
+                    void numEl.offsetWidth;
+                    numEl.classList.add('blook-pop');
+                    playSound('beep');
+                } else if (count === 0) {
+                    numEl.innerText = "ПОГНАЛИ!";
+                    playSound('correct');
+                } else {
+                    clearInterval(interval);
+                    overlay.classList.add('hidden');
+                    if (callback) callback();
+                }
+            }, 1000);
+        }
+
+        function showPlayerJoin() {
+            playSound('click');
+            userRole = 'player';
+            hideAllScreens();
+            renderAvatarGrid();
+            document.getElementById('playerJoinScreen').classList.remove('hidden');
+        }
+
+        async function submitPlayerJoin() {
+            playSound('click');
+            const rawCode = document.getElementById('joinCodeInput').value;
+            const codeInput = rawCode.replace(/\D/g, '').trim();
+            const nameInput = document.getElementById('joinNameInput').value.trim();
+
+            if (!codeInput || codeInput.length !== 6) {
+                showNotification("Ошибка", "Введите 6-значный цифровой код комнаты.");
+                return;
+            }
+            if (!nameInput) {
+                showNotification("Ошибка", "Пожалуйста, введите Ваше имя.");
+                return;
+            }
+
+            currentRoomCode = codeInput;
+            myPlayerName = nameInput;
+
+            const joinBtn = document.getElementById('joinSubmitBtn');
+            joinBtn.disabled = true;
+            joinBtn.innerText = '⚡ Вход в комнату...';
+
+            myPlayerId = 'player_' + Math.random().toString(36).substring(2, 9);
+            if (window.currentUser && window.currentUser.uid) {
+                myPlayerId = window.currentUser.uid;
+            }
+
+            const newPlayerData = {
+                id: myPlayerId,
+                name: myPlayerName,
+                avatar: selectedAvatar || '🦊',
+                score: 0,
+                streak: 0,
+                correctAnswers: 0,
+                answeredCurrent: false,
+                lastAnswerCorrect: null
+            };
+
+            let roomData = getLocalRoom(currentRoomCode);
+
+            if (!roomData && window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    const roomSnap = await window.fsGetDoc(roomRef);
+                    if (roomSnap.exists()) {
+                        roomData = roomSnap.data();
+                    }
+                } catch (getErr) {
+                    console.warn("Cloud room lookup fallback:", getErr);
+                }
+            }
+
+            if (!roomData) {
+                showNotification("Комната не найдена 🔍", `Комната с кодом ${currentRoomCode} не создана. Перепроверьте код с экрана учителя.`);
+                joinBtn.disabled = false;
+                joinBtn.innerText = '🎮 Войти в комнату';
+                return;
+            }
+
+            if (roomData.status === 'finished') {
+                showNotification("Игра завершена 🏁", "Турнир в этой комнате уже окончен.");
+                joinBtn.disabled = false;
+                joinBtn.innerText = '🎮 Войти в комнату';
+                return;
+            }
+
+            if (!roomData.players) roomData.players = {};
+            roomData.players[myPlayerId] = newPlayerData;
+
+            broadcastRoomUpdate(currentRoomCode, roomData);
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    await window.fsUpdateDoc(roomRef, {
+                        [`players.${myPlayerId}`]: newPlayerData
+                    });
+                } catch (err) {
+                    console.warn("Cloud player join update fallback:", err);
+                }
+            }
+
+            playSound('join');
+
+            hideAllScreens();
+            document.getElementById('playerWaitingScreen').classList.remove('hidden');
+            document.getElementById('playerWaitingAvatar').innerText = selectedAvatar || '🦊';
+            document.getElementById('playerGreetingText').innerHTML = `<span class="text-white font-bold text-base">${myPlayerName}</span>`;
+
+            window.onLocalRoomUpdate = (data) => {
+                if (userRole === 'player') handlePlayerRoomSync(data);
+            };
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    if (roomUnsubscribe) roomUnsubscribe();
+                    roomUnsubscribe = window.fsOnSnapshot(roomRef, (snapshot) => {
+                        if (snapshot && snapshot.exists()) {
+                            const data = snapshot.data();
+                            broadcastRoomUpdate(currentRoomCode, data);
+                            handlePlayerRoomSync(data);
+                        }
+                    }, (err) => console.warn("Player cloud sync fallback:", err));
+                } catch(e) {}
+            }
+
+            joinBtn.disabled = false;
+            joinBtn.innerText = '🎮 Войти в комнату';
+        }
+
+        let playerCountdownTriggered = false;
+        function handlePlayerRoomSync(data) {
+            if (data.players && !data.players[myPlayerId]) {
+                showNotification("Исключение", "Вас исключил ведущий комнаты.");
+                showRoleSelect();
+                return;
+            }
+
+            if (data.status === 'countdown' && !playerCountdownTriggered) {
+                playerCountdownTriggered = true;
+                triggerCountdownUI(() => {
+                    renderPlayerGame(data);
+                });
+            } else if (data.status === 'playing') {
+                document.getElementById('countdownOverlay').classList.add('hidden');
+                renderPlayerGame(data);
+            } else if (data.status === 'finished') {
+                document.getElementById('countdownOverlay').classList.add('hidden');
+                renderResultsScreen(data);
+            }
+        }
+
+        function renderHostGame(data) {
+            hideAllScreens();
+            const screen = document.getElementById('hostGameScreen');
+            screen.classList.remove('hidden');
+            screen.classList.add('flex');
+
+            document.getElementById('hostGameCodeBadge').innerText = `Код: ${currentRoomCode}`;
+
+            const qIdx = data.currentQuestionIdx || 0;
+            const questions = data.questions || QUESTIONS_45;
+            const q = questions[qIdx];
+
+            document.getElementById('hostQuestionNum').innerText = `ВОПРОС ${qIdx + 1} / ${questions.length}`;
+            document.getElementById('hostQuestionText').innerText = q.q;
+
+            const optsDisplay = document.getElementById('hostAnswerOptionsDisplay');
+            optsDisplay.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const isCorrect = i === q.correct;
+                optsDisplay.innerHTML += `
+                    <div class="p-3 rounded-xl card-glass border ${isCorrect ? 'border-emerald-500/80 bg-emerald-950/20' : 'border-slate-800'} text-xs flex items-center justify-between">
+                        <span class="font-medium text-slate-200">${opt}</span>
+                        <span class="font-bold text-[10px] px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}">${['A','B','C','D'][i]}</span>
+                    </div>
+                `;
+            });
+
+            const players = Object.values(data.players || {});
+            const answeredCount = players.filter(p => p.answeredCurrent).length;
+            document.getElementById('hostAnsweredCounter').innerText = `Ответили: ${answeredCount} из ${players.length}`;
+
+            const sorted = [...players].sort((a, b) => b.score - a.score);
+            const liveBoard = document.getElementById('hostLiveLeaderboard');
+            liveBoard.innerHTML = '';
+            sorted.forEach((p, idx) => {
+                liveBoard.innerHTML += `
+                    <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-2 truncate">
+                            <span class="font-bold text-slate-400 text-[11px]">#${idx + 1}</span>
+                            <span class="text-base shrink-0">${p.avatar || '🦊'}</span>
+                            <span class="font-bold text-white truncate">${p.name}</span>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="font-mono font-bold text-yellow-400 text-xs">${p.score}</span>
+                            ${p.streak > 1 ? `<span class="ml-1 text-[10px] text-amber-400">🔥x${p.streak}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function hostNextQuestion() {
+            playSound('click');
+            if (!currentRoomCode) return;
+            let room = getLocalRoom(currentRoomCode);
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    const roomSnap = await window.fsGetDoc(roomRef);
+                    if (roomSnap.exists()) room = roomSnap.data();
+                } catch(e) {}
+            }
+
+            if (!room) return;
+
+            const nextIdx = (room.currentQuestionIdx || 0) + 1;
+            const questions = room.questions || QUESTIONS_45;
+
+            if (nextIdx < questions.length) {
+                Object.keys(room.players || {}).forEach(pid => {
+                    room.players[pid].answeredCurrent = false;
+                    room.players[pid].lastAnswerCorrect = null;
+                });
+                room.currentQuestionIdx = nextIdx;
+                room.questionStartTime = Date.now();
+
+                broadcastRoomUpdate(currentRoomCode, room);
+
+                if (window.db) {
+                    try {
+                        const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                        await window.fsUpdateDoc(roomRef, {
+                            currentQuestionIdx: nextIdx,
+                            questionStartTime: Date.now(),
+                            players: room.players
+                        });
+                    } catch(e) {}
+                }
+            } else {
+                room.status = 'finished';
+                broadcastRoomUpdate(currentRoomCode, room);
+
+                if (window.db) {
+                    try {
+                        const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                        await window.fsUpdateDoc(roomRef, { status: 'finished' });
+                    } catch(e) {}
+                }
+            }
+        }
+
+        function renderPlayerGame(data) {
+            hideAllScreens();
+            const screen = document.getElementById('playerGameScreen');
+            screen.classList.remove('hidden');
+            screen.classList.add('flex');
+
+            const me = (data.players && data.players[myPlayerId]) || { score: 0, streak: 0, answeredCurrent: false };
+            document.getElementById('playerAvatarBadge').innerText = me.avatar || selectedAvatar || '🦊';
+            document.getElementById('playerSelfName').innerText = myPlayerName;
+            document.getElementById('playerSelfScore').innerText = `${me.score} оч.`;
+
+            const streakBadge = document.getElementById('playerStreakBadge');
+            if (me.streak && me.streak > 1) {
+                streakBadge.innerText = `🔥 x${me.streak}`;
+                streakBadge.classList.remove('hidden');
+            } else {
+                streakBadge.classList.add('hidden');
+            }
+
+            const qIdx = data.currentQuestionIdx || 0;
+            const questions = data.questions || QUESTIONS_45;
+            const q = questions[qIdx];
+
+            document.getElementById('playerQuestionNum').innerText = `ВОПРОС ${qIdx + 1} / ${questions.length}`;
+            document.getElementById('playerQuestionText').innerText = q.q;
+
+            const grid = document.getElementById('playerAnswersGrid');
+            grid.innerHTML = '';
+
+            const feedbackBox = document.getElementById('playerFeedbackBox');
+
+            if (me.answeredCurrent) {
+                feedbackBox.classList.remove('hidden');
+                if (me.lastAnswerCorrect) {
+                    feedbackBox.className = "card-glass rounded-xl p-4 text-center border-l-4 border-emerald-500 bg-emerald-500/10 neon-glow-green blook-pop";
+                    document.getElementById('playerFeedbackTitle').className = "font-bold text-sm mb-1 text-emerald-400";
+                    document.getElementById('playerFeedbackTitle').innerText = `✓ Отлично! +${me.lastPointsGained || 100} очков`;
+                } else {
+                    feedbackBox.className = "card-glass rounded-xl p-4 text-center border-l-4 border-rose-500 bg-rose-500/10 neon-glow-red blook-pop";
+                    document.getElementById('playerFeedbackTitle').className = "font-bold text-sm mb-1 text-rose-400";
+                    document.getElementById('playerFeedbackTitle').innerText = "✕ Неверный ответ!";
+                }
+                document.getElementById('playerFeedbackDesc').innerText = q.explanation;
+            } else {
+                feedbackBox.classList.add('hidden');
+            }
+
+            q.options.forEach((opt, idx) => {
+                const disabled = me.answeredCurrent;
+                grid.innerHTML += `
+                    <button 
+                        ${disabled ? 'disabled' : `onclick="submitPlayerAnswer(${idx})"`}
+                        class="p-4 rounded-xl card-glass border border-slate-700 text-left font-medium text-xs sm:text-sm text-slate-200 
+                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-indigo-500 hover:bg-indigo-500/10 active:scale-98 cursor-pointer'} transition flex items-center justify-between">
+                        <span>${opt}</span>
+                        <span class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-[10px] text-slate-400 shrink-0">
+                            ${['A', 'B', 'C', 'D'][idx]}
+                        </span>
+                    </button>
+                `;
+            });
+        }
+
+        async function submitPlayerAnswer(chosenIdx) {
+            if (!currentRoomCode || !myPlayerId) return;
+
+            let room = getLocalRoom(currentRoomCode);
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    const roomSnap = await window.fsGetDoc(roomRef);
+                    if (roomSnap.exists()) room = roomSnap.data();
+                } catch(e) {}
+            }
+
+            if (!room) return;
+
+            const qIdx = room.currentQuestionIdx || 0;
+            const questions = room.questions || QUESTIONS_45;
+            const q = questions[qIdx];
+            const isCorrect = chosenIdx === q.correct;
+
+            if (isCorrect) playSound('correct');
+            else playSound('wrong');
+
+            const me = (room.players && room.players[myPlayerId]) || { score: 0, streak: 0, correctAnswers: 0 };
+            
+            const startTime = room.questionStartTime || Date.now();
+            const elapsedSec = (Date.now() - startTime) / 1000;
+            const speedBonus = Math.max(0, Math.floor(100 - elapsedSec * 5));
+            const currentStreak = isCorrect ? (me.streak || 0) + 1 : 0;
+            const multiplier = currentStreak > 1 ? Math.min(2.5, 1 + currentStreak * 0.2) : 1;
+            
+            const pointsGained = isCorrect ? Math.round((100 + speedBonus) * multiplier) : 0;
+
+            const updatedPlayer = {
+                ...me,
+                score: (me.score || 0) + pointsGained,
+                streak: currentStreak,
+                correctAnswers: (me.correctAnswers || 0) + (isCorrect ? 1 : 0),
+                answeredCurrent: true,
+                lastAnswerCorrect: isCorrect,
+                lastPointsGained: pointsGained
+            };
+
+            room.players[myPlayerId] = updatedPlayer;
+            broadcastRoomUpdate(currentRoomCode, room);
+            renderPlayerGame(room);
+
+            if (window.db) {
+                try {
+                    const roomRef = window.fsDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'rooms', currentRoomCode);
+                    await window.fsUpdateDoc(roomRef, {
+                        [`players.${myPlayerId}`]: updatedPlayer
+                    });
+                } catch (err) {}
+            }
+        }
+
+        function renderResultsScreen(data) {
+            hideAllScreens();
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            const players = Object.values(data.players || {});
+            const sorted = players.sort((a, b) => b.score - a.score);
+
+            if (sorted.length > 0) {
+                document.getElementById('winnerName').innerText = `${sorted[0].avatar || '🦊'} ${sorted[0].name}`;
+            } else {
+                document.getElementById('winnerName').innerText = "Нет участников";
+            }
+
+            const listEl = document.getElementById('leaderboardList');
+            listEl.innerHTML = '';
+            sorted.forEach((p, idx) => {
+                listEl.innerHTML += `
+                    <div class="flex justify-between items-center p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-bold text-xs text-slate-400">#${idx + 1}</span>
+                            <span class="text-xl">${p.avatar || '🦊'}</span>
+                            <span class="font-bold text-white text-xs sm:text-sm">${p.name}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-mono font-bold text-yellow-400 text-xs sm:text-sm block">${p.score} оч.</span>
+                            <span class="text-[10px] text-slate-400">${p.correctAnswers || 0} отв.</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
